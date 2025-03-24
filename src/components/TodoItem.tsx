@@ -19,7 +19,7 @@ const TodoItem: React.FC<TodoItemProps> = ({ id, text, completed, onToggle, onDe
           onChange={() => onToggle(id)}
           className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
         />
-        <span className={`flex-1 ${completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>{text}</span>
+        <span className={`flex-1 ${completed ? 'line-through text-gray-500' : 'text-gray-200'}`}>{text}</span>
       </div>
       <button onClick={() => onDelete(id)} className="text-red-500 hover:text-red-700">
         Delete
