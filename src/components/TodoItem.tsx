@@ -2,11 +2,11 @@
 import React from 'react';
 
 interface TodoItemProps {
-  id: number;
+  id: string; // Change id type to string
   text: string;
   completed: boolean;
-  onToggle: (id: number) => void;
-  onDelete: (id: number) => void;
+  onToggle: (id: string) => void; // Change id type to string
+  onDelete: (id: string) => void; // Change id type to string
 }
 
 const TodoItem: React.FC<TodoItemProps> = ({ id, text, completed, onToggle, onDelete }) => {

@@ -1,29 +1,65 @@
-// src/app/page.tsx
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TodoList from '@/components/TodoList';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
+
+interface TodoType {
+  id: string;
+  text: string;
+  completed: boolean;
+}
 
 export default function Home() {
-  const [todos, setTodos] = useState<{ id: number; text: string; completed: boolean }[]>([]);
+  const [todos, setTodos] = useState<TodoType[]>([]);
   const [newTodo, setNewTodo] = useState('');
-  const [nextId, setNextId] = useState(1);
 
-  const addTodo = () => {
+  useEffect(() => {
+    async function getTodos() {
+      const querySnapshot = await getDocs(collection(db, 'todos'));
+      const todoList: TodoType[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        text: doc.data().text,
+        completed: doc.data().completed,
+      }));
+      setTodos(todoList);
+    }
+    getTodos();
+  }, []);
+
+  const addTodo = async () => {
     if (newTodo.trim()) {
-      setTodos([...todos, { id: nextId, text: newTodo, completed: false }]);
+      await addDoc(collection(db, 'todos'), { text: newTodo, completed: false });
       setNewTodo('');
-      setNextId(nextId + 1);
+      getTodos();
     }
   };
 
-  const toggleTodo = (id: number) => {
-    setTodos(todos.map((todo) => (todo.id === id ? { ...todo, completed: !todo.completed } : todo)));
+  const toggleTodo = async (id: string) => {
+    const todoDoc = doc(db, 'todos', id);
+    const todo = todos.find((todo) => todo.id === id);
+    if(todo){
+      await updateDoc(todoDoc, { completed: !todo.completed });
+      getTodos();
+    }
   };
 
-  const deleteTodo = (id: number) => {
-    setTodos(todos.filter((todo) => todo.id !== id));
+  const deleteTodo = async (id: string) => {
+    const todoDoc = doc(db, 'todos', id);
+    await deleteDoc(todoDoc);
+    getTodos();
   };
+
+  async function getTodos() {
+      const querySnapshot = await getDocs(collection(db, 'todos'));
+      const todoList: TodoType[] = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        text: doc.data().text,
+        completed: doc.data().completed,
+      }));
+      setTodos(todoList);
+    }
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
